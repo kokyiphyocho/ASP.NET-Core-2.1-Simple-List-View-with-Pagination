@@ -1,0 +1,117 @@
+﻿@*Bind with Multiple Model using Tuple type*@
+@model Tuple<IEnumerable<SimpleListView.Models.Movie>, SimpleListView.Models.Pagination>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@*Link to page specific CSS file*@
+@section page_css
+    {
+    <link rel="stylesheet" href="~/css/home.index.css" />
+}
+
+<div class="home_index">
+    <h2>Movie List</h2>
+
+    @*Rending Item Container*@
+    <div class="ec-container">
+        @*Loop through List<Movie> and render all items*@
+        @foreach (var item in Model.Item1)
+        {
+            <div class="item">
+                <div class="ec-imagecell">
+                    @*If file not found, it will use noimage.jpg*@
+                    <img src="~/images/movies/@(item.MovieID).jpg" onerror="this.onerror=null;this.src='images/movies/noimage.jpg';" />
+                </div>
+                <div class="ec-infocell">
+                    <div class="ec-titlesection">
+                        <span class="ec-title">
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </span>
+
+                        <span class="ec-year">
+                            (@Html.DisplayFor(modelItem => item.Year))
+                        </span>
+                    </div>
+                    <div class="ec-infosection">
+                        <span>
+                            @Html.DisplayFor(modelItem => item.Category)
+                        </span>
+                        <span>
+                            @Html.DisplayFor(modelItem => item.Duration)
+                        </span>
+                        <span>
+                            @Html.DisplayFor(modelItem => item.Genre)
+                        </span>
+                    </div>
+                    <div class="ec-descriptionsection">
+                        <span class="ec-description">
+                            @Html.DisplayFor(modelItem => item.BriefStory)
+                        </span>
+                    </div>
+                    <div class="ec-castsection">
+                        <span class="ec-castlabel">
+                            Director:
+                        </span>
+
+                        <span class="ec-cast">
+                            @Html.DisplayFor(modelItem => item.Director)
+                        </span>
+
+                        <span class="ec-castlabel">
+                            Cast :
+                        </span>
+
+                        <span class="ec-cast">
+                            @Html.DisplayFor(modelItem => item.Cast)
+                        </span>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+
+    @*Render Pagination Area*@
+    <nav>
+        @*Use larger pagination button*@
+        <ul class="pagination pagination-lg">
+
+            @*Render Previous Button*@
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                    <span class="sr-only">Previous</span>
+                </a>
+            </li>
+            @{
+                @*Ensure to render only pagination.PageButtonCount, based on Current Page No.*@
+                var startPage   = Model.Item2.PageNo - (Model.Item2.PageButtonCount / 2);
+                var endPage     = Model.Item2.PageNo + (Model.Item2.PageButtonCount / 2);
+                endPage        -= startPage < 0 ? startPage : 0;
+                startPage      -= endPage > Model.Item2.TotalPages ? endPage - Model.Item2.TotalPages : 0;
+
+                @*Limit the start and end page number*@
+                startPage       = Math.Max(startPage, 0) + 1;
+                endPage         = Math.Min(endPage, Model.Item2.TotalPages);
+            }
+
+            @*Render page buttons*@
+            @for (var i = startPage; i <= endPage; i++)
+            {
+                <li class="page-item @(i == Model.Item2.PageNo ? "active" : "")">
+                    <a asp-route-pageno="@i" class="page-link">@i</a>
+                </li>
+
+            }
+
+            @*Render Next Button*@
+            <li class="page-item">
+                <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
